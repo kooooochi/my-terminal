@@ -7,11 +7,14 @@ Personal terminal configuration files for WezTerm and Starship prompt.
 - `wezterm.lua` - WezTerm main configuration
 - `keybinds.lua` - WezTerm keybindings
 - `starship.toml` - Starship prompt configuration
+- `nvim/init.lua` - Neovim configuration
+- `nvim/lazy-lock.json` - Neovim plugin lock file
 
 ## Prerequisites
 
 - [WezTerm](https://wezfurlong.org/wezterm/) - GPU-accelerated terminal emulator
 - [Starship](https://starship.rs/) - Cross-shell prompt
+- [Neovim](https://neovim.io/) - Hyperextensible Vim-based text editor
 
 ### Installation
 
@@ -25,6 +28,25 @@ brew install --cask wezterm
 ```bash
 # macOS
 brew install starship
+```
+
+**Neovim and dependencies:**
+```bash
+# macOS
+# Neovim本体
+brew install neovim
+
+# 必須の依存関係
+brew install ripgrep    # Telescope検索機能に必要
+brew install fd         # Telescopeファイル検索に必要
+brew install node       # LSPサーバーのインストールに必要
+
+# オプション（使用する言語に応じて）
+brew install rust-analyzer  # Rust開発に必要
+
+# Nerd Font（アイコン表示に必要）
+brew tap homebrew/cask-fonts
+brew install --cask font-hack-nerd-font
 ```
 
 ## Setup
@@ -62,6 +84,26 @@ eval "$(starship init zsh)"  # for zsh
 eval "$(starship init bash)" # for bash
 ```
 
+### Neovim Configuration
+
+Create a symlink for Neovim config:
+
+```bash
+# Create config directory if it doesn't exist
+mkdir -p ~/.config/nvim
+
+# Create symlink
+ln -sf $(pwd)/nvim/init.lua ~/.config/nvim/init.lua
+```
+
+Launch Neovim to automatically install plugins (managed by lazy.nvim):
+
+```bash
+nvim
+```
+
+The first launch will install all plugins automatically. LSP servers (rust-analyzer, pyright, lua_ls) will be installed via Mason on demand.
+
 ## WezTerm Keybindings
 
 Leader key: `Ctrl+q`
@@ -97,6 +139,12 @@ ls -la ~/.config/wezterm/
 
 # Check Starship config location
 ls -la ~/.config/starship.toml
+
+# Check Neovim config location
+ls -la ~/.config/nvim/
+
+# Check Neovim installation
+nvim --version
 ```
 
 Restart your terminal for changes to take effect.
