@@ -8,7 +8,8 @@ M.keys = {
   { key = "t", mods = "LEADER", action = act.SpawnTab("CurrentPaneDomain") },
   { key = "w", mods = "LEADER", action = act.CloseCurrentTab({ confirm = true }) },
   { key = "]", mods = "LEADER", action = act.ActivateTabRelative(1) },
-  { key = "[", mods = "LEADER", action = act.ActivateTabRelative(-1) },
+  { key = "p", mods = "LEADER", action = act.ActivateTabRelative(-1) },
+  { key = "[", mods = "LEADER", action = act.ActivateCopyMode },
 
   -- タブを番号で選択
   { key = "1", mods = "LEADER", action = act.ActivateTab(0) },
@@ -29,8 +30,8 @@ M.keys = {
   { key = "n", mods = "LEADER", action = act.SpawnWindow },
 
   -- ペイン操作
-  { key = "-", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-  { key = "=", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+  { key = "y", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+  { key = "u", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
   { key = "x", mods = "LEADER", action = act.CloseCurrentPane({ confirm = true }) },
   { key = "h", mods = "LEADER", action = act.ActivatePaneDirection("Left") },
   { key = "j", mods = "LEADER", action = act.ActivatePaneDirection("Down") },
@@ -53,6 +54,24 @@ M.keys = {
   { key = "0", mods = "CMD", action = act.ResetFontSize },
 }
 
-M.key_tables = {}
+M.key_tables = {
+  copy_mode = {
+    { key = "Escape", mods = "NONE", action = act.CopyMode("Close") },
+    { key = "q", mods = "NONE", action = act.CopyMode("Close") },
+    { key = "h", mods = "NONE", action = act.CopyMode("MoveLeft") },
+    { key = "j", mods = "NONE", action = act.CopyMode("MoveDown") },
+    { key = "k", mods = "NONE", action = act.CopyMode("MoveUp") },
+    { key = "l", mods = "NONE", action = act.CopyMode("MoveRight") },
+    { key = "b", mods = "NONE", action = act.CopyMode("MoveBackwardWord") },
+    { key = "w", mods = "NONE", action = act.CopyMode("MoveForwardWord") },
+    { key = "0", mods = "NONE", action = act.CopyMode("MoveToStartOfLine") },
+    { key = "$", mods = "SHIFT", action = act.CopyMode("MoveToEndOfLineContent") },
+    { key = "g", mods = "NONE", action = act.CopyMode("MoveToScrollbackTop") },
+    { key = "G", mods = "SHIFT", action = act.CopyMode("MoveToScrollbackBottom") },
+    { key = "v", mods = "NONE", action = act.CopyMode({ SetSelectionMode = "Cell" }) },
+    { key = "V", mods = "SHIFT", action = act.CopyMode({ SetSelectionMode = "Line" }) },
+    { key = "y", mods = "NONE", action = act.Multiple({ act.CopyTo("ClipboardAndPrimarySelection"), act.CopyMode("Close") }) },
+  },
+}
 
 return M
