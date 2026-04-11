@@ -1,6 +1,6 @@
 # Terminal Configuration
 
-Personal terminal configuration files for WezTerm and Starship prompt.
+Personal terminal configuration files for WezTerm, Starship prompt, Neovim, and fzf shell search.
 
 ## Contents
 
@@ -15,8 +15,9 @@ Personal terminal configuration files for WezTerm and Starship prompt.
 - [WezTerm](https://wezfurlong.org/wezterm/) - GPU-accelerated terminal emulator
 - [Starship](https://starship.rs/) - Cross-shell prompt
 - [Neovim](https://neovim.io/) - Hyperextensible Vim-based text editor
+- [fzf](https://github.com/junegunn/fzf) - Command-line fuzzy finder for interactive search
 
-### Installation
+## Installation
 
 **WezTerm:**
 ```bash
@@ -28,6 +29,12 @@ brew install --cask wezterm
 ```bash
 # macOS
 brew install starship
+```
+
+**fzf:**
+```bash
+# macOS
+brew install fzf
 ```
 
 **Neovim and dependencies:**
@@ -60,8 +67,8 @@ Create symlinks from this repository to WezTerm's config directory:
 mkdir -p ~/.config/wezterm
 
 # Create symlinks
-ln -sf $(pwd)/wezterm.lua ~/.config/wezterm/wezterm.lua
-ln -sf $(pwd)/keybinds.lua ~/.config/wezterm/keybinds.lua
+ln -sf "$(pwd)/wezterm.lua" ~/.config/wezterm/wezterm.lua
+ln -sf "$(pwd)/keybinds.lua" ~/.config/wezterm/keybinds.lua
 ```
 
 ### Starship Configuration
@@ -73,7 +80,7 @@ Create a symlink for Starship config:
 mkdir -p ~/.config
 
 # Create symlink
-ln -sf $(pwd)/starship.toml ~/.config/starship.toml
+ln -sf "$(pwd)/starship.toml" ~/.config/starship.toml
 ```
 
 Add to your shell profile (`~/.zshrc` or `~/.bashrc`):
@@ -84,6 +91,34 @@ eval "$(starship init zsh)"  # for zsh
 eval "$(starship init bash)" # for bash
 ```
 
+### fzf Shell Integration
+
+Enable fzf key bindings and shell completion:
+
+```bash
+/opt/homebrew/opt/fzf/install --all
+```
+
+This installer generates `~/.fzf.zsh` and `~/.fzf.bash`, then appends the appropriate source line to your shell profile.
+
+If you want to add the zsh integration manually, place this line in `~/.zshrc`:
+
+```bash
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+```
+
+Reload your shell after installation:
+
+```bash
+source ~/.zshrc
+```
+
+Common shortcuts after setup:
+
+- `Ctrl-R` - Fuzzy search shell history
+- `**` then `Tab` - Trigger fuzzy path completion
+- `fzf` - Start an interactive fuzzy finder directly
+
 ### Neovim Configuration
 
 Create a symlink for Neovim config:
@@ -93,7 +128,7 @@ Create a symlink for Neovim config:
 mkdir -p ~/.config/nvim
 
 # Create symlink
-ln -sf $(pwd)/nvim/init.lua ~/.config/nvim/init.lua
+ln -sf "$(pwd)/nvim/init.lua" ~/.config/nvim/init.lua
 ```
 
 Launch Neovim to automatically install plugins (managed by lazy.nvim):
@@ -142,6 +177,12 @@ ls -la ~/.config/starship.toml
 
 # Check Neovim config location
 ls -la ~/.config/nvim/
+
+# Check fzf installation
+command -v fzf
+
+# Check fzf zsh integration
+ls -la ~/.fzf.zsh
 
 # Check Neovim installation
 nvim --version
