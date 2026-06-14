@@ -1,3 +1,10 @@
+-- luarocks パスを追加（image.nvim の magick 用）
+package.path = package.path
+  .. ";" .. vim.fn.expand("$HOME") .. "/.luarocks/share/lua/5.1/?.lua"
+  .. ";" .. vim.fn.expand("$HOME") .. "/.luarocks/share/lua/5.1/?/init.lua"
+package.cpath = package.cpath
+  .. ";" .. vim.fn.expand("$HOME") .. "/.luarocks/lib/lua/5.1/?.so"
+
 -- lazy.nvim インストール
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -31,6 +38,13 @@ require("lazy").setup({
     "folke/tokyonight.nvim",
     priority = 1000,
     config = function()
+      require("tokyonight").setup({
+        transparent = false,
+        styles = {
+          sidebars = "dark",
+          floats = "dark",
+        },
+      })
       vim.cmd("colorscheme tokyonight")
     end,
   },
@@ -44,7 +58,7 @@ require("lazy").setup({
       "MunifTanjim/nui.nvim",
     },
     keys = {
-      { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "ファイルツリー" },
+      { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "ファイルツリーを開閉" },
     },
     config = function()
       require("neo-tree").setup({
@@ -58,7 +72,7 @@ require("lazy").setup({
     "nvim-telescope/telescope.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     keys = {
-      { "<C-p>", "<cmd>Telescope find_files<cr>", desc = "ファイル検索" },
+      { "<C-f>", "<cmd>Telescope find_files<cr>", desc = "ファイル検索" },
       { "<C-S-f>", "<cmd>Telescope live_grep<cr>", desc = "文字列検索" },
       { "<leader>ff", "<cmd>Telescope find_files<cr>" },
       { "<leader>fg", "<cmd>Telescope live_grep<cr>" },
@@ -156,6 +170,7 @@ require("lazy").setup({
         sources = {
           { name = "nvim_lsp" },
           { name = "luasnip" },
+          { name = "crates" },
           { name = "buffer" },
           { name = "path" },
         },
@@ -173,7 +188,7 @@ require("lazy").setup({
     config = function()
       -- Neovim 0.11+ ではビルトインのtreesitter設定を使う
       vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "rust", "python", "java", "lua", "toml", "json" },
+        pattern = { "rust", "python", "java", "lua", "toml", "json", "markdown", "mermaid", "html", "css" },
         callback = function()
           pcall(vim.treesitter.start)
         end
@@ -187,6 +202,45 @@ require("lazy").setup({
     config = function()
       require("gitsigns").setup()
     end
+  },
+
+  -- Rust拡張機能
+  {
+    "mrcjkb/rustaceanvim",
+    version = "^5",
+    ft = { "rust" },
+    config = function()
+      vim.g.rustaceanvim = {
+        server = {
+          capabilities = require("cmp_nvim_lsp").default_capabilities(),
+          settings = {
+            ["rust-analyzer"] = {
+              checkOnSave = {
+                command = "clippy",
+              },
+              cargo = {
+                allFeatures = true,
+              },
+            },
+          },
+        },
+      }
+    end,
+  },
+
+  -- Cargo.toml依存関係管理
+  {
+    "saecki/crates.nvim",
+    event = { "BufRead Cargo.toml" },
+    config = function()
+      require("crates").setup({
+        completion = {
+          cmp = {
+            enabled = true,
+          },
+        },
+      })
+    end,
   },
 
   -- ターミナル
@@ -238,23 +292,97 @@ require("lazy").setup({
       require("which-key").setup()
     end
   },
+
+  -- Markdownプレビュー（ブラウザ表示、Mermaid対応）
+  {
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    ft = { "markdown", "mermaid" },
+    build = function() vim.fn["mkdp#util#install"]() end,
+    keys = {
+      { "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", desc = "Markdownプレビュー", ft = "markdown" },
+    },
+    config = function()
+      vim.g.mkdp_auto_close = 0
+      vim.g.mkdp_theme = "dark"
+      vim.g.mkdp_filetypes = { "markdown", "mermaid" }
+      vim.g.mkdp_preview_options = {
+        mkit = {},
+        katex = {},
+        uml = {},
+        maid = {},  -- Mermaid対応
+        disable_sync_scroll = 0,
+        sync_scroll_type = "middle",
+        hide_yaml_meta = 1,
+        sequence_diagrams = {},
+        flowchart_diagrams = {},
+        content_editable = false,
+        disable_filename = 0,
+        toc = {}
+      }
+    end,
+  },
+
+  -- 画像インライン表示（Kitty Graphics Protocol）
+  {
+    "3rd/image.nvim",
+    build = false,
+    opts = {
+      backend = "kitty",
+      integrations = {
+        markdown = {
+          enabled = true,
+          clear_in_insert_mode = false,
+          download_remote_images = true,
+          only_render_image_at_cursor = false,
+          filetypes = { "markdown", "vimwiki" },
+        },
+      },
+      max_width = 100,
+      max_height = 12,
+      max_height_window_percentage = math.huge,
+      max_width_window_percentage = math.huge,
+      window_overlap_clear_enabled = true,
+      window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "" },
+    },
+  },
+
+  -- NeoVim内でのMarkdownレンダリング
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    ft = { "markdown", "mermaid" },
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+    keys = {
+      { "<leader>mr", "<cmd>RenderMarkdown toggle<cr>", desc = "Markdownレンダリング", ft = "markdown" },
+    },
+    config = function()
+      require("render-markdown").setup({
+        heading = {
+          enabled = true,
+          sign = true,
+          icons = { "󰲡 ", "󰲣 ", "󰲥 ", "󰲧 ", "󰲩 ", "󰲫 " },
+          backgrounds = { "RenderMarkdownH1Bg", "RenderMarkdownH2Bg", "RenderMarkdownH3Bg", "RenderMarkdownH4Bg", "RenderMarkdownH5Bg", "RenderMarkdownH6Bg" },
+          foregrounds = { "RenderMarkdownH1", "RenderMarkdownH2", "RenderMarkdownH3", "RenderMarkdownH4", "RenderMarkdownH5", "RenderMarkdownH6" },
+        },
+        code = {
+          enabled = true,
+          sign = false,
+          style = "full",
+          left_pad = 2,
+          right_pad = 2,
+        },
+        bullet = {
+          enabled = true,
+          icons = { "●", "○", "◆", "◇" },
+        },
+      })
+    end,
+  },
 })
 
 -- LSP設定（Neovim 0.11+ の新しいAPI）
+-- 注: rust_analyzerはrustaceanvimプラグインで管理されます
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
-vim.lsp.config.rust_analyzer = {
-  cmd = { "rust-analyzer" },
-  filetypes = { "rust" },
-  root_markers = { "Cargo.toml", ".git" },
-  capabilities = capabilities,
-  settings = {
-    ["rust-analyzer"] = {
-      checkOnSave = { command = "clippy" },
-      cargo = { allFeatures = true },
-    }
-  }
-}
 
 vim.lsp.config.pyright = {
   cmd = { "pyright-langserver", "--stdio" },
@@ -270,7 +398,7 @@ vim.lsp.config.lua_ls = {
   capabilities = capabilities,
 }
 
-vim.lsp.enable({ "rust_analyzer", "pyright", "lua_ls" })
+vim.lsp.enable({ "pyright", "lua_ls" })
 
 -- LSPキーマップ
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -300,3 +428,41 @@ vim.keymap.set("n", "<leader>x", "<cmd>bdelete<cr>")
 -- 保存
 vim.keymap.set("n", "<C-s>", "<cmd>w<cr>")
 vim.keymap.set("i", "<C-s>", "<esc><cmd>w<cr>")
+
+-- Markdown固有の設定
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "markdown" },
+  callback = function()
+    -- 折りたたみ設定
+    vim.opt_local.foldmethod = "expr"
+    vim.opt_local.foldexpr = "nvim_treesitter#foldexpr()"
+    vim.opt_local.foldenable = false  -- デフォルトでは折りたたまない
+
+    -- テキスト幅とラップ設定
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+
+    -- Markdownリンクを簡単にコンシールする
+    vim.opt_local.conceallevel = 2
+    vim.opt_local.concealcursor = ""
+
+    -- インデント設定
+    vim.opt_local.tabstop = 2
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.expandtab = true
+
+    -- スペルチェック（オプション、英語のみ）
+    -- vim.opt_local.spell = true
+    -- vim.opt_local.spelllang = "en"
+  end
+})
+
+-- .mermaidファイルをMarkdownとして認識
+vim.filetype.add({
+  extension = {
+    mmd = "mermaid",
+  },
+  pattern = {
+    [".*%.mermaid"] = "mermaid",
+  },
+})
