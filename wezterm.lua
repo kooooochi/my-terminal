@@ -12,6 +12,7 @@ config.use_ime = true
 config.window_background_opacity = 0.5
 config.macos_window_background_blur = 20
 
+
 ----------------------------------------------------
 -- Tab
 ----------------------------------------------------
@@ -75,6 +76,22 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
     { Foreground = { Color = edge_foreground } },
     { Text = SOLID_RIGHT_ARROW },
   }
+end)
+
+----------------------------------------------------
+-- Claude Code Notification Handler
+----------------------------------------------------
+-- OSC 1337 SetUserVar で受け取り、toast_notification で表示する
+wezterm.on('user-var-changed', function(window, pane, name, value)
+  if name == 'claude_code_notify' then
+    -- OSC 1337 経由の値は base64 エンコードされている
+    local decoded = wezterm.base64_decode(value)
+    local title, message = string.match(decoded, "([^|]+)|(.+)")
+    if title and message and window then
+      wezterm.log_info(string.format("[Claude Code] %s: %s", title, message))
+      window:toast_notification("Claude Code", title, message, 3000)
+    end
+  end
 end)
 
 ----------------------------------------------------
