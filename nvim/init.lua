@@ -49,21 +49,15 @@ require("lazy").setup({
     end,
   },
 
-  -- ファイルツリー（サイドバー）
+  -- ファイラー
   {
-    "nvim-neo-tree/neo-tree.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons",
-      "MunifTanjim/nui.nvim",
-    },
+    "stevearc/oil.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     keys = {
-      { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "ファイルツリーを開閉" },
+      { "<leader>e", "<cmd>Oil<cr>", desc = "ファイラーを開く" },
     },
     config = function()
-      require("neo-tree").setup({
-        window = { width = 30 },
-      })
+      require("oil").setup()
     end,
   },
 
@@ -90,7 +84,7 @@ require("lazy").setup({
       require("bufferline").setup({
         options = {
           diagnostics = "nvim_lsp",
-          offsets = {{ filetype = "neo-tree", text = "Explorer", padding = 1 }},
+          offsets = {{ filetype = "oil", text = "Explorer", padding = 1 }},
         },
       })
     end,
