@@ -70,8 +70,8 @@ require("lazy").setup({
     "nvim-telescope/telescope.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     keys = {
-      { "<C-f>", "<cmd>Telescope find_files<cr>", desc = "ファイル検索" },
-      { "<C-S-f>", "<cmd>Telescope live_grep<cr>", desc = "文字列検索" },
+      { "<C-f>", "<cmd>Telescope live_grep<cr>", desc = "文字列検索" },
+      { "<C-S-f>", "<cmd>Telescope find_files<cr>", desc = "ファイル検索" },
       { "<leader>ff", "<cmd>Telescope find_files<cr>" },
       { "<leader>fg", "<cmd>Telescope live_grep<cr>" },
       { "<leader>fb", "<cmd>Telescope buffers<cr>" },
@@ -199,8 +199,38 @@ require("lazy").setup({
     "kdheepak/lazygit.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     keys = {
-      { "<leader>g", "<cmd>LazyGit<cr>", desc = "LazyGitを開く" },
+      { "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGitを開く" },
+      {
+        "<leader>gh",
+        function()
+          if vim.bo.modified then vim.cmd("w") end
+          vim.cmd("LazyGitFilterCurrentFile")
+        end,
+        desc = "現在ファイルのコミット履歴",
+      },
     },
+  },
+  {
+    "lewis6991/gitsigns.nvim",
+    keys = {
+      {
+        "<leader>b",
+        function()
+          for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            if vim.bo[buf].filetype == "gitsigns-blame" then
+              vim.api.nvim_win_close(win, true)
+              return
+            end
+          end
+          vim.cmd("Gitsigns blame")
+        end,
+        desc = "Blameパネルのトグル",
+      },
+    },
+    config = function()
+      require("gitsigns").setup()
+    end,
   },
 
   -- Rust拡張機能
