@@ -57,7 +57,11 @@ require("lazy").setup({
       { "<leader>e", "<cmd>Oil<cr>", desc = "ファイラーを開く" },
     },
     config = function()
-      require("oil").setup()
+      require("oil").setup({
+        keymaps = {
+          ["q"] = "actions.close",
+        },
+      })
     end,
   },
 
@@ -190,12 +194,13 @@ require("lazy").setup({
     end
   },
 
-  -- Git表示
+  -- Git
   {
-    "lewis6991/gitsigns.nvim",
-    config = function()
-      require("gitsigns").setup()
-    end
+    "kdheepak/lazygit.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    keys = {
+      { "<leader>g", "<cmd>LazyGit<cr>", desc = "LazyGitを開く" },
+    },
   },
 
   -- Rust拡張機能
