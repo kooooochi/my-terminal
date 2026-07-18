@@ -449,6 +449,16 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end
 })
 
+-- ウィンドウ移動キーマップ
+vim.keymap.set("n", "<C-h>", "<C-w>h")
+vim.keymap.set("n", "<C-j>", "<C-w>j")
+vim.keymap.set("n", "<C-k>", "<C-w>k")
+vim.keymap.set("n", "<C-l>", "<C-w>l")
+vim.keymap.set("t", "<C-h>", [[<C-\><C-n><C-w>h]])
+vim.keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]])
+vim.keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]])
+vim.keymap.set("t", "<C-l>", [[<C-\><C-n><C-w>l]])
+
 -- バッファ操作キーマップ
 vim.keymap.set("n", "<S-l>", "<cmd>BufferLineCycleNext<cr>")
 vim.keymap.set("n", "<S-h>", "<cmd>BufferLineCyclePrev<cr>")
